@@ -1,0 +1,74 @@
+name: Playwright Tests with Allure
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install Playwright CLI
+        run: dotnet tool install --global Microsoft.Playwright.CLI
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Install Playwright browsers
+        run: playwright install
+      - name: Run tests with Allure
+        run: |
+          dotnet add package NUnit
+          dotnet add package Microsoft.Playwright
+          dotnet add package Allure.Commons
+          dotnet add package NUnit.Allure
+          dotnet test --logger:"console;verbosity=normal" --results-directory ./allure-results
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-results
+          path: ./allure-results
+
+  report:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Allure results
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-results
+          path: ./allure-results
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@v1
+        with:
+          results-path: ./allure-results
+          report-path: ./allure-report
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: ./allure-report
+
+  deploy:
+    needs: report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Allure report
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-report
+          path: ./allure-report
+      - name: Deploy Allure report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          publish_branch: gh-pages
