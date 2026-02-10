@@ -45,7 +45,9 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       
       - name: Install Playwright browsers
-        run: pwsh bin/Release/net8.0/playwright.ps1 install ${{ matrix.browser }} --with-deps
+        run: |
+          dotnet tool install --global Microsoft.Playwright.CLI
+          playwright install ${{ matrix.browser }} --with-deps
       
       - name: Run tests
         env:
@@ -76,7 +78,7 @@ jobs:
       - name: Merge results
         run: |
           mkdir -p ./allure-results
-          find ./artifacts -name "*.json" -o -name "*.txt" | xargs -I {} cp {} ./allure-results/
+          find ./artifacts -type f \( -name "*.json" -o -name "*.txt" \) -exec cp {} ./allure-results/ \;
       
       - name: Generate Allure report
         uses: simple-elf/allure-report-action@v1
@@ -89,4 +91,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report
+        - name: Log GitHub Pages URL
+          run: echo "Allure report deployed at: https://tjmaher.github.io/login-c-sharp/"
