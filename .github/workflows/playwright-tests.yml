@@ -9,7 +9,8 @@ on:
       - main
 
 jobs:
-  test:
+  test-chromium:
+    name: Test (Chromium)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,46 +24,121 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Install Playwright browsers
-        run: playwright install
-      - name: Run tests with Allure
+        run: playwright install chromium
+      - name: Run tests with Allure (Chromium)
         run: |
           dotnet add package NUnit
           dotnet add package Microsoft.Playwright
           dotnet add package Allure.Commons
           dotnet add package NUnit.Allure
-          dotnet test --logger:"console;verbosity=normal" --results-directory ./allure-results
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v3
+          dotnet test --logger:"console;verbosity=normal" --results-directory ./allure-results-chromium -- TestRunParameters.Parameter(name=Browser,value=chromium)
+      - name: Upload Allure results (Chromium)
+        uses: actions/upload-artifact@v4
         with:
-          name: allure-results
-          path: ./allure-results
+          name: allure-results-chromium
+          path: ./allure-results-chromium
 
-  report:
-    needs: test
+  test-firefox:
+    name: Test (Firefox)
     runs-on: ubuntu-latest
     steps:
-      - name: Download Allure results
-        uses: actions/download-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          name: allure-results
-          path: ./allure-results
+          dotnet-version: '10.0.x'
+      - name: Install Playwright CLI
+        run: dotnet tool install --global Microsoft.Playwright.CLI
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Install Playwright browsers
+        run: playwright install firefox
+      - name: Run tests with Allure (Firefox)
+        run: |
+          dotnet add package NUnit
+          dotnet add package Microsoft.Playwright
+          dotnet add package Allure.Commons
+          dotnet add package NUnit.Allure
+          dotnet test --logger:"console;verbosity=normal" --results-directory ./allure-results-firefox -- TestRunParameters.Parameter(name=Browser,value=firefox)
+      - name: Upload Allure results (Firefox)
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-firefox
+          path: ./allure-results-firefox
+
+  test-webkit:
+    name: Test (WebKit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install Playwright CLI
+        run: dotnet tool install --global Microsoft.Playwright.CLI
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Install Playwright browsers
+        run: playwright install webkit
+      - name: Run tests with Allure (WebKit)
+        run: |
+          dotnet add package NUnit
+          dotnet add package Microsoft.Playwright
+          dotnet add package Allure.Commons
+          dotnet add package NUnit.Allure
+          dotnet test --logger:"console;verbosity=normal" --results-directory ./allure-results-webkit -- TestRunParameters.Parameter(name=Browser,value=webkit)
+      - name: Upload Allure results (WebKit)
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-webkit
+          path: ./allure-results-webkit
+
+  merge-and-report:
+    name: Merge Allure Results and Generate Report
+    needs: [test-chromium, test-firefox, test-webkit]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Allure results (Chromium)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-chromium
+          path: ./allure-results-chromium
+      - name: Download Allure results (Firefox)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-firefox
+          path: ./allure-results-firefox
+      - name: Download Allure results (WebKit)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-webkit
+          path: ./allure-results-webkit
+      - name: Merge Allure results
+        run: |
+          mkdir -p ./allure-results
+          cp -r ./allure-results-chromium/* ./allure-results/ || true
+          cp -r ./allure-results-firefox/* ./allure-results/ || true
+          cp -r ./allure-results-webkit/* ./allure-results/ || true
       - name: Generate Allure report
         uses: simple-elf/allure-report-action@v1
         with:
           results-path: ./allure-results
           report-path: ./allure-report
       - name: Upload Allure report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: ./allure-report
 
   deploy:
-    needs: report
+    needs: merge-and-report
     runs-on: ubuntu-latest
     steps:
       - name: Download Allure report
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: allure-report
           path: ./allure-report
