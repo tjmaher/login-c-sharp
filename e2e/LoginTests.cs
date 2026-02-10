@@ -30,6 +30,7 @@ namespace login_c_sharp.e2e
         }
 
         [Test]
+        [Category("Smoke")]
         public async Task Login_WithValidCredentials_ShouldSucceed()
         {
             await _loginPage.GoToAsync();

@@ -5,6 +5,16 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Choose to run either SMOKE or ALL tests'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - smoke
+          - all 
 
 permissions:
   contents: write
@@ -17,7 +27,7 @@ concurrency:
 
 jobs:
   test:
-    name: Test (${{ matrix.browser }})
+    name: ${{ matrix.browser }} test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -37,6 +47,8 @@ jobs:
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
       
       - name: Restore dependencies
         run: dotnet restore
@@ -47,12 +59,19 @@ jobs:
       - name: Install Playwright browsers
         run: |
           dotnet tool install --global Microsoft.Playwright.CLI
-          pwsh ./bin/Release/net8.0/playwright.ps1 install --with-deps
+          playwright install --with-deps
       
       - name: Run tests
+        timeout-minutes: 30
         env:
           BROWSER: ${{ matrix.browser }}
-        run: dotnet test --configuration Release --no-build --logger:"console;verbosity=normal" --results-directory ./allure-results
+        run: |
+          TEST_SUITE="${{ github.event.inputs.test_suite || 'all' }}"
+          if [ "$TEST_SUITE" = "smoke" ]; then
+            dotnet test --configuration Release --no-build --filter Category=Smoke --logger:"console;verbosity=normal" --results-directory ./allure-results
+          else
+            dotnet test --configuration Release --no-build --logger:"console;verbosity=normal" --results-directory ./allure-results
+          fi
       
       - name: Upload Allure results
         if: always()
@@ -78,9 +97,27 @@ jobs:
       - name: Merge results
         run: |
           mkdir -p ./allure-results
-          cp -r ./artifacts/allure-results-chromium/* ./allure-results/ 2>/dev/null || true
-          cp -r ./artifacts/allure-results-firefox/* ./allure-results/ 2>/dev/null || true
-          cp -r ./artifacts/allure-results-webkit/* ./allure-results/ 2>/dev/null || true
+          find ./artifacts -name "allure-results-*" -type d | while read dir; do
+            echo "Merging $dir"
+            cp -r "$dir"/* ./allure-results/ 2>/dev/null || true
+          done
+          echo "Total files merged: $(ls -1 ./allure-results 2>/dev/null | wc -l)"
+      
+      - name: Download previous report history
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+      
+      - name: Copy history
+        run: |
+          if [ -d gh-pages/history ]; then
+            echo "Copying history from previous report"
+            cp -r gh-pages/history ./allure-results/
+          else
+            echo "No previous history found"
+          fi
       
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -88,12 +125,22 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       
+      - name: Cache Allure
+        id: cache-allure
+        uses: actions/cache@v3
+        with:
+          path: /opt/allure
+          key: allure-2.25.0
+      
       - name: Install Allure
+        if: steps.cache-allure.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
           tar -zxvf allure-2.25.0.tgz
           sudo mv allure-2.25.0 /opt/allure
-          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+      
+      - name: Link Allure
+        run: sudo ln -sf /opt/allure/bin/allure /usr/bin/allure
       
       - name: Generate Allure report
         run: |
@@ -105,3 +152,9 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-report
+      
+      - name: Add report URL to summary
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "### 📊 Allure Report Published" >> $GITHUB_STEP_SUMMARY
+          echo "Report URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
