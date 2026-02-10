@@ -57,9 +57,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       
       - name: Install Playwright browsers
-        run: |
-          dotnet tool install --global Microsoft.Playwright.CLI
-          playwright install --with-deps
+        run: pwsh bin/Release/net8.0/playwright.ps1 install --with-deps
       
       - name: Run tests
         timeout-minutes: 30
