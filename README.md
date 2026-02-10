@@ -8,6 +8,16 @@ Want to see what prompts were used for this site? The last section contains a su
 
 WARNING! Chat-GPT 4.1 has a cutoff date of two years ago. When creating a workflow, it did not realize that it was using a deprecated version of actions/upload-artifact (v3) causing the workflow to fail. Caveat emptor!
 
+So, how did GitHub Copilot + Chat GPT do creating an automation framework? I would say it did so good that it was hideously frustrating when it messed up the simple things. 
+
+It's like an eager-to-please junior dev who doesn't completely know the material and doesn't know it isn't reading the latest documentation. 
+
+ Why would it not know it was implementing out-of-date libraries when creating the GitHub Actions Workflow? It was so sure it had everything correct until I copied-and-pasted the error I received from the GitHub Actions log files and fed the error back to it. 
+
+ Why does it not read actual documentation? Why does it skip carefully enumerated steps? And why does it always profusely apologize to me while doing the same mistake over and over again? 
+
+ I feel that it got me 80% there, but it was super frustrating needing to drag it bodily across the finish line. 
+
 # GitHub CoPilot: Activate!
 
 ## Local Development Setup
@@ -273,13 +283,3 @@ This setup is required for running Allure CLI, which generates test reports from
 For more details, see:
 - [actions/setup-java GitHub Action](https://github.com/actions/setup-java)
 - [Allure CLI Documentation](https://docs.qameta.io/allure/#_installing_a_commandline)
-
-# Afterword by T.J. Maher
-
-So, how did GitHub Copilot + Chat GPT do creating an automation framework? I would say it did so good that it was hideously frustrating when it messed up on the simple things.
-
- Why would it not know it was implementing out-of-date libraries when creating the GitHub Actions Workflow? It was so sure it had everything correct until I copied-and-pasted the error I received from GitHub Actions log files that were thrown and feed the error back to it. 
-
- Why does it not read actual documentation? Why does it skip carefully enumerated steps? And why does it always profusely apologize to me while doing the same mistake over and over again? It's like an eager-to-please junior dev who doesn't know it isn't reading the latest documentation. 
-
- I feel that it got me 80% there, but it was super frustrating needing to drag it bodily across the finish line. 
