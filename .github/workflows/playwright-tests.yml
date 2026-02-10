@@ -47,7 +47,7 @@ jobs:
       - name: Install Playwright browsers
         run: |
           dotnet tool install --global Microsoft.Playwright.CLI
-          playwright install ${{ matrix.browser }} --with-deps
+            pwsh ./bin/Release/net8.0/playwright.ps1 install --with-deps
       
       - name: Run tests
         env:
