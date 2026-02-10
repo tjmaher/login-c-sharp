@@ -242,7 +242,7 @@ The workflow uses `runs-on: ubuntu-latest` for its jobs. This specifies that eac
 
 For more details, see the [GitHub-hosted runners documentation](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners).
 
-# Why Playwright Supports Multiple Browsers
+# How Playwright Supports Multiple Browsers
 
 Playwright was designed to enable reliable end-to-end testing across all major browser engines—Chromium, Firefox, and WebKit. By supporting these browsers, Playwright ensures that web applications are tested for compatibility, performance, and correctness in environments used by real users worldwide.
 
@@ -261,3 +261,25 @@ For more details, see:
 - **Firefox**: First released in 2004 by Mozilla, Firefox is a free and open-source browser recognized for its privacy features, extensibility, and strong web standards support. [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/) | [Firefox Wikipedia](https://en.wikipedia.org/wiki/Firefox)
 
 - **WebKit**: Originally developed by Apple in 2003, WebKit is the engine behind Safari and many mobile browsers. It is known for its performance and wide adoption in the mobile ecosystem. [WebKit Project](https://webkit.org/) | [WebKit Wikipedia](https://en.wikipedia.org/wiki/WebKit)
+
+# Java Setup in Workflow
+
+The workflow uses:
+- `distribution: 'temurin'`: Specifies the Temurin distribution of OpenJDK, a popular, open-source Java runtime maintained by the Eclipse Adoptium project. [Temurin Documentation](https://adoptium.net/temurin/)
+- `java-version: '17'`: Installs Java 17, a long-term support (LTS) version of the Java platform. [Java 17 Release Notes](https://www.oracle.com/java/technologies/javase/17-relnote-issues.html)
+
+This setup is required for running Allure CLI, which generates test reports from results.
+
+For more details, see:
+- [actions/setup-java GitHub Action](https://github.com/actions/setup-java)
+- [Allure CLI Documentation](https://docs.qameta.io/allure/#_installing_a_commandline)
+
+# Afterword by T.J. Maher
+
+So, how did GitHub Copilot + Chat GPT do creating an automation framework? I would say it did so good that it was hideously frustrating when it messed up on the simple things.
+
+ Why would it not know it was implementing out-of-date libraries when creating the GitHub Actions Workflow? It was so sure it had everything correct until I copied-and-pasted the error I received from GitHub Actions log files that were thrown and feed the error back to it. 
+
+ Why does it not read actual documentation? Why does it skip carefully enumerated steps? And why does it always profusely apologize to me while doing the same mistake over and over again? It's like an eager-to-please junior dev who doesn't know it isn't reading the latest documentation. 
+
+ I feel that it got me 80% there, but it was super frustrating needing to drag it bodily across the finish line. 

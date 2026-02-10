@@ -47,7 +47,7 @@ jobs:
       - name: Install Playwright browsers
         run: |
           dotnet tool install --global Microsoft.Playwright.CLI
-            pwsh ./bin/Release/net8.0/playwright.ps1 install --with-deps
+          pwsh ./bin/Release/net8.0/playwright.ps1 install --with-deps
       
       - name: Run tests
         env:
@@ -82,11 +82,22 @@ jobs:
           cp -r ./artifacts/allure-results-firefox/* ./allure-results/ 2>/dev/null || true
           cp -r ./artifacts/allure-results-webkit/* ./allure-results/ 2>/dev/null || true
       
-      - name: Generate Allure report
-        uses: simple-elf/allure-report-action@v1
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          allure_results: allure-results
-          allure_report: allure-report
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Install Allure
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+          tar -zxvf allure-2.25.0.tgz
+          sudo mv allure-2.25.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+      
+      - name: Generate Allure report
+        run: |
+          allure generate ./allure-results --clean -o ./allure-report
       
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
