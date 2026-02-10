@@ -2,6 +2,8 @@
 
 ## Introduction by T.J. Maher
 
+Like this project? View sample code from the last ten years of T.J. Maher's automation development work at [TJMaher.com / Programming Projects](https://www.tjmaher.com/p/programming-projects.html) and his articles about software testing at [TJMaher.com / Media](https://www.tjmaher.com/p/media.html). And be sure to check out his [LinkedIn Profile](https://www.linkedin.com/in/tjmaher1/)! 
+
 **The test:** Given a website, such as https://the-internet.herokuapp.com/login, can GitHub Copilot examine the website, and create through only prompting an automated test framework using C#, NUnit, and Playwright? 
 
 Want to see what prompts were used for this site? The last section contains a summary used to create this project and its documentation, along with the actions Copilot executed. GitHub Copilot was with GPT-4.1, the free version. Only very few minor tweaks of this documentation and code below were needed, such as weird formating issues in YAML files, and new text in this README placed incorrectly. 
