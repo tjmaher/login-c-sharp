@@ -198,3 +198,66 @@ The following prompts were used to generate and update project documentation:
 
 - Each browser's results are labeled and merged for clarity.
 - The Allure report is always available via GitHub Pages after each workflow run.
+
+# Workflow Command Reference
+
+Below are key commands used in the GitHub Actions workflow, with links to official documentation, per request of T.J. Maher:
+
+- [`dotnet tool install --global Microsoft.Playwright.CLI`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install): Installs the Playwright CLI as a global .NET tool. See [Playwright .NET CLI Docs](https://playwright.dev/dotnet/docs/cli).
+- [`playwright install`](https://playwright.dev/docs/cli#install): Installs Playwright browsers. See [Playwright Install Docs](https://playwright.dev/docs/installation#install-browsers).
+- [`dotnet restore`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-restore): Restores NuGet dependencies for the project.
+- [`dotnet build`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build): Builds the .NET project.
+- [`dotnet test`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test): Runs tests using the specified test framework.
+- [`actions/setup-dotnet`](https://github.com/actions/setup-dotnet): GitHub Action to set up the .NET environment.
+- [`actions/cache`](https://github.com/actions/cache): GitHub Action to cache dependencies.
+- [`actions/upload-artifact`](https://github.com/actions/upload-artifact): Uploads test results and artifacts.
+- [`simple-elf/allure-report-action`](https://github.com/simple-elf/allure-report-action): Generates Allure reports from test results.
+- [`peaceiris/actions-gh-pages`](https://github.com/peaceiris/actions-gh-pages): Deploys the Allure report to GitHub Pages.
+
+For more details, see the [GitHub Actions Documentation](https://docs.github.com/en/actions).
+
+# GitHub Actions Used in Workflow
+
+The following GitHub Actions are used in the CI workflow. Each automates a key step in the test and reporting pipeline:
+
+- [`actions/checkout`](https://github.com/actions/checkout): Checks out your repository code so workflow jobs can access it.
+- [`actions/setup-dotnet`](https://github.com/actions/setup-dotnet): Sets up the .NET environment for building and testing C# projects.
+- [`actions/cache`](https://github.com/actions/cache): Caches dependencies (like NuGet packages) to speed up workflow runs.
+- [`actions/upload-artifact`](https://github.com/actions/upload-artifact): Uploads test results and other files as artifacts for later jobs or download.
+- [`actions/download-artifact`](https://github.com/actions/download-artifact): Downloads previously uploaded artifacts for use in subsequent jobs.
+- [`simple-elf/allure-report-action`](https://github.com/simple-elf/allure-report-action): Generates Allure test reports from results.
+- [`peaceiris/actions-gh-pages`](https://github.com/peaceiris/actions-gh-pages): Deploys the generated Allure report to GitHub Pages for public access.
+
+Each action is documented in its linked repository, with usage instructions and configuration options.
+
+# Workflow Runner Environment
+
+The workflow uses `runs-on: ubuntu-latest` for its jobs. This specifies that each job will execute on a fresh virtual machine running the latest stable version of Ubuntu Linux provided by GitHub Actions.
+
+- **Why use ubuntu-latest?**
+  - It is the default and most widely supported runner for CI workflows.
+  - Provides a consistent, up-to-date environment with pre-installed tools for .NET, Node.js, Python, and browser automation.
+  - Ensures compatibility with Playwright, NUnit, and Allure reporting tools.
+  - Offers fast startup times and broad community support.
+
+For more details, see the [GitHub-hosted runners documentation](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners).
+
+# Why Playwright Supports Multiple Browsers
+
+Playwright was designed to enable reliable end-to-end testing across all major browser engines—Chromium, Firefox, and WebKit. By supporting these browsers, Playwright ensures that web applications are tested for compatibility, performance, and correctness in environments used by real users worldwide.
+
+- **Cross-browser coverage**: Testing in Chromium, Firefox, and WebKit helps catch issues that may only appear in specific engines, improving quality and user experience.
+- **Web standards compliance**: Each browser implements web standards differently. Playwright’s multi-browser support helps developers verify their apps work as intended everywhere.
+- **Mobile and desktop parity**: WebKit powers Safari on iOS, Chromium powers Chrome and Edge, and Firefox is widely used on desktop and mobile. Playwright’s support covers both desktop and mobile platforms.
+
+For more details, see:
+- [Playwright Browser Support](https://playwright.dev/docs/browsers)
+- [Playwright Announcement Blog](https://playwright.dev/blog/introducing-playwright)
+
+# Brief History of Browsers Built into Playwright
+
+- **Chromium**: Released in 2008 by Google, Chromium is the open-source project that powers Google Chrome and Microsoft Edge. It is known for its speed, security, and developer tools. [Chromium Project](https://www.chromium.org/) | [Chromium Wikipedia](https://en.wikipedia.org/wiki/Chromium_(web_browser))
+
+- **Firefox**: First released in 2004 by Mozilla, Firefox is a free and open-source browser recognized for its privacy features, extensibility, and strong web standards support. [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/) | [Firefox Wikipedia](https://en.wikipedia.org/wiki/Firefox)
+
+- **WebKit**: Originally developed by Apple in 2003, WebKit is the engine behind Safari and many mobile browsers. It is known for its performance and wide adoption in the mobile ecosystem. [WebKit Project](https://webkit.org/) | [WebKit Wikipedia](https://en.wikipedia.org/wiki/WebKit)
