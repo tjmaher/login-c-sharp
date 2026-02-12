@@ -20,6 +20,11 @@ It's like an eager-to-please junior dev who doesn't completely know the material
 
  I feel that it got me 80% there, but it was super frustrating needing to drag it bodily across the finish line. 
 
+## Introducing a new challenger: Cursor AI!
+
+It's a head-to-head matchup! Cursor AI versus VS Code + GitHub CoPilot battling to create automated test frameworks using MS Playwright + C#. Who creates the best tests for The-Internet / Login? The best GitHub Actions Workflow? The best README docs? And can it be created only using prompts?
+* View Source Code: (https://github.com/tjmaher/cursor-creates-playwright-c-sharp)
+
 # GitHub CoPilot: Activate!
 
 ## Local Development Setup
